@@ -1,0 +1,51 @@
+{
+  "name": "indexed-db-stream",
+  "version": "1.0.0",
+  "description": "Use node.js streams to read from / write to an IndexedDB.",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test",
+    "typescript": "ts"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.2",
+    "@types/mocha": "^2.2.41",
+    "browserify": "^14.4.0",
+    "chai": "^4.1.1",
+    "istanbul": "^0.4.5",
+    "karma": "^1.7.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.1",
+    "karma-mocha": "^1.3.0",
+    "karma-safari-launcher": "^1.0.0",
+    "karma-webpack": "^2.0.4",
+    "mocha": "^3.5.0",
+    "tslint": "^5.5.0",
+    "typedoc": "^0.8.0",
+    "typescript": "^2.4.2",
+    "webpack": "^3.4.1"
+  },
+  "scripts": {
+    "test": "tsc; istanbul instrument lib -o test-tmp && karma start karma.conf.js && rm -Rf test-tmp",
+    "browser-test": "tsc; cp -R lib test-tmp && browserify test/index.js -o browser-test/bundle.js && rm -Rf test-tmp",
+    "doc": "typedoc --out ./typedoc/ --exclude ts/tile-layer.directive.spec.ts --mode file ts/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atd-schubert/indexed-db-stream.git"
+  },
+  "keywords": [
+    "indexed-db",
+    "stream",
+    "browser",
+    "storage",
+    "store"
+  ],
+  "author": "Arne Schubert <atd.schubert@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atd-schubert/indexed-db-stream/issues"
+  },
+  "homepage": "https://github.com/atd-schubert/indexed-db-stream#readme"
+}
