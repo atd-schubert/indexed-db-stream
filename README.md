@@ -41,10 +41,10 @@ const reader = new indexedDbStream.IndexedDbReadStream({
 });
 
 reader.pipe(/* ... */);
-reader.on("data", function(chunk) {
+reader.on('data', function(chunk) {
     console.log('This is from your IndexedDB:', chunk);
 });
-reader.on("end", function() {
+reader.on('end', function() {
     console.log('Reader finished...');
 });
 ```
@@ -56,32 +56,32 @@ import { IndexedDbReadStream, IndexedDbWriteStream } from "indexed-db-stream"
 
 // Keep in mind that you have to create your database first on the "onupgradeneeded" event!
 const writer: IndexedDbWriteStream = new IndexedDbWriteStream({
-    databaseName: 'myDatabase',
+    databaseName: "myDatabase",
     databaseVersion: 1, // optional
-    objectStoreName: 'myStore'
+    objectStoreName: "myStore"
 });
 
-writer.write({text: 'first chunk'});
-writer.write({text: 'second chunk'});
+writer.write({text: "first chunk"});
+writer.write({text: "second chunk"});
 // ...
 writer.end();
 
 // -- same for the reader --
 
 const reader: IndexedDbReadStream = new IndexedDbReadStream({
-    databaseName: 'myDatabase',
+    databaseName: "myDatabase",
     databaseVersion: 1, // optional
-    objectStoreName: 'myStore',
-    indexName: 'myIndex', // optional
-    cursorDirection: 'next' // optional
+    objectStoreName: "myStore",
+    indexName: "myIndex", // optional
+    cursorDirection: "next" // optional
 });
 
 reader.pipe(/* ... */);
 reader.on("data", (chunk: any) => {
-    console.log('This is from your IndexedDB:', chunk);
+    console.log("This is from your IndexedDB:", chunk);
 });
 reader.on("end", () => {
-    console.log('Reader finished...');
+    console.log("Reader finished...");
 });
 ```
 
