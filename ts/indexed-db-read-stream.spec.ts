@@ -1,11 +1,14 @@
-import { expect } from "chai";
-import { IndexedDbReadStream } from "./index";
+import {expect} from "chai";
+import {IndexedDbReadStream} from "./index";
 
-import { TEST_DATA, TEST_DATABASE_NAME_PREFIX, TEST_DATABASE_VERSION, TEST_OBJECT_STORE_NAME} from "./spec-common";
+import {TEST_DATA, TEST_DATABASE_NAME_PREFIX, TEST_DATABASE_VERSION, TEST_OBJECT_STORE_NAME} from "./spec-common";
+
 const TEST_DATABASE_NAME: string = TEST_DATABASE_NAME_PREFIX + "read";
 
 /* tslint:disable:no-empty */
-function noop() {}
+function noop() {
+}
+
 /* tslint:enable */
 
 describe("IndexDB read stream", () => {
@@ -22,7 +25,7 @@ describe("IndexDB read stream", () => {
 
         dbRequest.addEventListener("upgradeneeded", (dbEvent: any) => {
             const database: IDBDatabase = dbEvent.target.result;
-            database.createObjectStore(TEST_OBJECT_STORE_NAME, { keyPath: "id"})
+            database.createObjectStore(TEST_OBJECT_STORE_NAME, {keyPath: "id"})
                 .createIndex("index", "index");
         });
     });
@@ -180,7 +183,50 @@ describe("IndexDB read stream", () => {
         reader.on("data", noop);
     });
 
+    it("should be destroyable at the beggining", (done: MochaDone) => {
+        let pos: number = 0;
+        const reader = new IndexedDbReadStream({
+            databaseName: TEST_DATABASE_NAME,
+            databaseVersion: TEST_DATABASE_VERSION,
+            objectStoreName: TEST_OBJECT_STORE_NAME,
+        });
+        reader.on("error", /* istanbul ignore next */ (err: Error) => {
+            done(err);
+        });
+        reader.on("data", (data: any) => {
+            expect(data).to.deep.equal(TEST_DATA[pos]);
+            pos += 1;
+        });
+        reader.on("end", () => {
+            expect(pos).to.equal(0);
+            done();
+        });
+        reader.destroy();
+    });
 
+    it("should be destroyable", (done: MochaDone) => {
+        let pos: number = 0;
+        const stopPosition = TEST_DATA.length / 2;
+        const reader = new IndexedDbReadStream({
+            databaseName: TEST_DATABASE_NAME,
+            databaseVersion: TEST_DATABASE_VERSION,
+            objectStoreName: TEST_OBJECT_STORE_NAME,
+        });
+        reader.on("error", /* istanbul ignore next */ (err: Error) => {
+            done(err);
+        });
+        reader.on("data", (data: any) => {
+            expect(data).to.deep.equal(TEST_DATA[pos]);
+            pos += 1;
+            if (pos === stopPosition) {
+                reader.destroy();
+            }
+        });
+        reader.on("end", () => {
+            expect(pos).to.equal(stopPosition);
+            done();
+        });
+    });
 
     //
     // it.skip("should stream all data from store in backwards direction");
