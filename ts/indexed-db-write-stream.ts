@@ -1,11 +1,14 @@
-import { Writable } from "stream";
-import { IIndexedDbCommonOptions } from "./indexed-db-common";
+import {Writable} from "stream";
+import {IIndexedDbCommonOptions} from "./indexed-db-common";
 
 /**
  * Options to create a writable Stream for the IndexedDB
  */
+
 /* tslint:disable:no-empty-interface */
-export interface IIndexedDbWriteStreamOptions extends IIndexedDbCommonOptions {}
+export interface IIndexedDbWriteStreamOptions extends IIndexedDbCommonOptions {
+}
+
 /* tslint:enable */
 
 /**
@@ -13,14 +16,17 @@ export interface IIndexedDbWriteStreamOptions extends IIndexedDbCommonOptions {}
  */
 export class IndexedDbWriteStream extends Writable {
     constructor(protected options: IIndexedDbWriteStreamOptions) {
-        super({ objectMode: true });
+        super({objectMode: true});
     }
+
     public _write(chunk: any, encoding: string, next: () => void): void {
         const dbRequest = indexedDB.open(this.options.databaseName, this.options.databaseVersion);
         dbRequest.addEventListener("success", (dbEvent: any) => {
             let tx: IDBRequest;
+            const database: IDBDatabase = dbEvent.target.result;
+
             try {
-                tx = dbEvent.target.result.transaction([this.options.objectStoreName], "readwrite")
+                tx = database.transaction([this.options.objectStoreName], "readwrite")
                     .objectStore(this.options.objectStoreName)
                     .add(chunk);
 
@@ -29,6 +35,8 @@ export class IndexedDbWriteStream extends Writable {
                 return;
             }
             tx.addEventListener("success", () => {
+
+                database.close();
                 next();
             });
             tx.addEventListener("error", (event: any) => {
