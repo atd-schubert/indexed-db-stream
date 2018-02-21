@@ -154,6 +154,30 @@ describe("IndexDB read stream", () => {
             done();
         });
     });
+
+    it("should stop streaming data from a store index after destroy", (done: MochaDone) => {
+        let pos: number = 0;
+        const indexes = ["a", "b", "c", "d", "e"];
+        const reader = new IndexedDbReadStream({
+            cursorDirection: "nextunique",
+            databaseName: TEST_DATABASE_NAME,
+            databaseVersion: TEST_DATABASE_VERSION,
+            indexName: "index",
+            objectStoreName: TEST_OBJECT_STORE_NAME,
+        });
+        reader.on("error", /* istanbul ignore next */ (err: Error) => {
+            done(err);
+        });
+        reader.on("data", (data: any) => {
+            expect(data.index).to.deep.equal(indexes[pos]);
+            pos += 1;
+            reader.destroy();
+        });
+        reader.on("end", () => {
+            expect(pos).to.equal(1);
+            done();
+        });
+    });
     it("should emit error when object-store is not available", (done: MochaDone) => {
         const reader = new IndexedDbReadStream({
             databaseName: "n-a",
@@ -179,23 +203,4 @@ describe("IndexDB read stream", () => {
         });
         reader.on("data", noop);
     });
-
-
-
-    //
-    // it.skip("should stream all data from store in backwards direction");
-    // it.skip("should stream unique data from store");
-    // it.skip("should stream unique data from store in backwards direction");
-    // it("should emit error when store is not available", (done: MochaDone) => {
-    //     const reader = new IndexedDbReadStream({
-    //         databaseName: "not-available",
-    //         databaseVersion: 1,
-    //         objectStoreName: "not-available",
-    //         indexName: "not-available"
-    //     });
-    //     reader.on("error", /* istanbul ignore next */ (err) => {
-    //         console.log("err", err);
-    //         done();
-    //     });
-    // });
 });
